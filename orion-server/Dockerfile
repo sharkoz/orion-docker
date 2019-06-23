@@ -1,4 +1,4 @@
-FROM python:2.7.14-slim
+FROM python:2.7.16-slim
 MAINTAINER Kevin Lin <developer@kevinlin.info>
 
 ARG sha
@@ -8,8 +8,7 @@ ARG database_name
 ARG database_user
 ARG database_password
 
-RUN apt-get update
-RUN apt-get install -y wget unzip python-dev libmysqlclient-dev gcc build-essential
+RUN apt-get update && apt-get install -y wget unzip python-dev default-libmysqlclient-dev gcc build-essential
 
 RUN wget -O orion-server.zip https://github.com/LINKIWI/orion-server/archive/$sha.zip
 RUN unzip orion-server.zip
