@@ -2,43 +2,33 @@
 version: '3'
 
 services:
-  db:
+  orion-db:
     image: mysql:5.7
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=orion
       - MYSQL_DATABASE=orion
 
-  server:
+  orion-server:
     restart: always
-    build:
-      context: orion-server
-      args:
-        sha: fedb85c8b2980bfc4dea7bf93ca17e059f63b1c1
-        database_host: db
-        database_port: 3306
-        database_name: orion
-        database_user: root
-        database_password: orion
+    image: cosme/orion-server
+    environment:
+      - DATABASE_HOST=orion-db
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=orion
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=orion
     depends_on:
-      - db
+      - orion-db
 
-  web:
+  orion-web:
     restart: always
-    build:
-      context: orion-web
-      args:
-        sha: 8c18dce19a2199c4c53e1145881d362a05018cd5
-        mapbox_api_token: ${MAPBOX_API_TOKEN}
+    image: cosme/orion-web
+    environment:
+      - LISTEN_PORT=80
+      - SERVER_URL=orion-server
+      - SERVER_PORT=80
     depends_on:
-      - server
-
-  http:
-    image: nginx:1.13.7
-    restart: always
-    volumes:
-      - ./http/nginx.conf:/etc/nginx/nginx.conf
+      - orion-server
     ports:
-      - "${PORT}:80"
-    depends_on:
-      - web
+      - "80:80"
